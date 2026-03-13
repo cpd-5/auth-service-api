@@ -67,5 +67,5 @@ public class SystemUser {
     @OneToOne(mappedBy = "systemUser")
     private Otp otp;
 
-// One-to-one relationship with Otp
+// One-to-one relationship with Otp//
 }
