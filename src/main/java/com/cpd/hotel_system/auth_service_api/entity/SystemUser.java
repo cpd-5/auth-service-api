@@ -16,7 +16,7 @@ import java.time.Instant;
 public class SystemUser {
     @Id
     @Column(name="user_id",length = 80,nullable=false)
-    private String userID;
+    private String userId;
 
     @Column(name ="keycloak_id",length = 80,nullable = false)
     private String keycloakId;
@@ -64,7 +64,7 @@ public class SystemUser {
     @Column(name ="updated_at")
     private Instant updatedAt;
 
-    @OneToOne(mappedBy = "systemUser" , cascade = CascadeType.ALL.)
+    @OneToOne(mappedBy = "systemUser" , cascade = CascadeType.ALL)
     private Otp otp;
 
 // One-to-one relationship with Otp//
