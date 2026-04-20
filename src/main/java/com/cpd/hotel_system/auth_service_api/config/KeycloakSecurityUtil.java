@@ -3,11 +3,12 @@ package com.cpd.hotel_system.auth_service_api.config;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
+
 
 import java.security.Key;
 
-@ComponentScan
+@Component
 public class KeycloakSecurityUtil {
     Keycloak keycloak;
 

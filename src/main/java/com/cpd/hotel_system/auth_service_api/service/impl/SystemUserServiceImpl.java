@@ -1,19 +1,35 @@
 package com.cpd.hotel_system.auth_service_api.service.impl;
 
-import com.cpd.hotel_system.auth_service_api.BadRequestException;
+import com.cpd.hotel_system.auth_service_api.entity.Otp;
+import com.cpd.hotel_system.auth_service_api.exception.BadRequestException;
+import com.cpd.hotel_system.auth_service_api.config.KeycloakSecurityUtil;
 import com.cpd.hotel_system.auth_service_api.dto.request.SystemUserRequestDto;
+import com.cpd.hotel_system.auth_service_api.entity.SystemUser;
+import com.cpd.hotel_system.auth_service_api.exception.DuplicateEntryException;
+import com.cpd.hotel_system.auth_service_api.repo.OtpRepo;
 import com.cpd.hotel_system.auth_service_api.repo.SystemUserRepo;
 import com.cpd.hotel_system.auth_service_api.service.SystemUserService;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
+
+import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
 public class SystemUserServiceImpl implements SystemUserService {
 
+    @Value("${keycloak.config.realm}")
+    private String realm;
+
+
     private final SystemUserRepo systemUserRepo;
+    private final OtpRepo otpRepo;
+    private final KeycloakSecurityUtil keycloakUtil;
 
     @Override
     public void createUser(SystemUserRequestDto dto) {
@@ -22,11 +38,11 @@ public class SystemUserServiceImpl implements SystemUserService {
                 }
 
         if(dto.getLastName()== null || dto.getLastName().trim().isEmpty()){
-            throw new BadRequestException("First name is required");
+            throw new BadRequestException("Last name is required");
         }
 
         if(dto.getEmail()==null ||dto.getEmail().trim().isEmpty()){
-            throw new BadRequestException("First name is required");
+            throw new BadRequestException("Email is required");
         }
 
         String userId="";
@@ -34,6 +50,33 @@ public class SystemUserServiceImpl implements SystemUserService {
         Keycloak keycloak=null;
 
         //when user save anything keycloak also have connection and user generate otp
+        UserRepresentation existingUser = null;
+        keycloak =keycloakUtil.getKeycloakInstance();
+
+        existingUser=keycloak.realm(realm).users().search(dto.getEmail()).stream()
+                .findFirst().orElse(null );
+
+        if(existingUser!=null){
+            Optional<SystemUser> selectedSystemUserFromAuthService = systemUserRepo.findByEmail(dto.getEmail());
+            if(selectedSystemUserFromAuthService.isEmpty()){
+              keycloak.realm(realm).users().delete(existingUser.getId());
+            }else{
+             throw new DuplicateEntryException("Email already exists");
+            }
+
+        }else{
+            Optional<SystemUser>selectedSystemUserFromAuthService =
+            systemUserRepo.findByEmail(dto.getEmail());
+            if(selectedSystemUserFromAuthService.isPresent()){
+               Optional<Otp> selectedOtp=
+                       OtpRepo.findBySystemUserId(selectedSystemUserFromAuthService.get().getUserID());
+               if(selectedOtp.isPresent()){
+                  otpRepo.deleteById(selectedOtp.get().getPropertyId());
+               }
+               systemUserRepo.deleteById(selectedSystemUserFromAuthService.get().getUserID());
+            }
+
+        }
 
     }
 }
