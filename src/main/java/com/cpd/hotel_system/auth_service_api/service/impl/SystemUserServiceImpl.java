@@ -75,7 +75,7 @@ public class SystemUserServiceImpl implements SystemUserService {
             systemUserRepo.findByEmail(dto.getEmail());
             if(selectedSystemUserFromAuthService.isPresent()){
                Optional<Otp> selectedOtp=
-                       OtpRepo.findBySystemUserId(selectedSystemUserFromAuthService.get().getUserId());
+                       otpRepo.findBySystemUserId(selectedSystemUserFromAuthService.get().getUserId());
                if(selectedOtp.isPresent()){
                   otpRepo.deleteById(selectedOtp.get().getPropertyId());
                }
