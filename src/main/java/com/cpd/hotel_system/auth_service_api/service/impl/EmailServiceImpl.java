@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.time.Year;
 
 @Service
@@ -31,9 +32,9 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public boolean sendUserSignupVerificationCode(String toEmail, String subject, String otp, String firstName) throws IOException {
 
-        String htmlBody = emailTemplateHelper.loadHtmlTemplate("template/otpverification.html");
+        String htmlBody = emailTemplateHelper.loadHtmlTemplate("template/host-init.html");
         htmlBody = htmlBody.replace("${firstName}", firstName);
-        htmlBody = htmlBody.replace("${otp}", otp);
+        htmlBody = htmlBody.replace("${password}", otp);
         htmlBody = htmlBody.replace("${year}", String.valueOf(Year.now().getValue()));
 
         Email from = new Email(senderEmail);
@@ -55,5 +56,10 @@ public class EmailServiceImpl implements EmailService {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean sendHostPassword(String toEmail, String subject, String password, String firstName) throws IOException {
+       throw new UnsupportedEncodingException("Unimplemented method 'sendHostPassword'");
     }
 }
