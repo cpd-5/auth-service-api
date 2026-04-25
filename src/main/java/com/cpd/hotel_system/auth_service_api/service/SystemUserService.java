@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.List;
 
 public interface SystemUserService {
-    void createUser(SystemUserRequestDto dto) throws IOException;
-    void initializeHosts(List<SystemUserRequestDto> users) throws IOException;
+    public void createUser(SystemUserRequestDto dto) throws IOException;
+    public void initializeHosts(List<SystemUserRequestDto> users) throws IOException;
+    public void resend(String email,String type);
+
 }

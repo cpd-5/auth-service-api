@@ -28,7 +28,7 @@ public class Otp {
     private Instant updatedAt;
 
     @Column(name ="is_verified")
-    private boolean isVerified;
+    private Boolean isVerified;
 
     @Column(name ="attempts")
     private Integer attempts;
